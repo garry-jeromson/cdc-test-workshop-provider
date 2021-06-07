@@ -1,0 +1,31 @@
+version: '3.5'
+services:
+  consumer:
+    image: subitogo/cdc-test-workshop
+    build:
+      context: .
+      dockerfile: ops/consumer/Dockerfile
+      target: develop
+    ports:
+      - 3000:3000
+    user: ${TEST_USER}
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./consumer/app:/srv/app
+      # Mount a named volume to the node_modules folder. This is a workaround to ensure that we never accidentally
+      # mount our local node_modules volume in the container; it allows us to develop both inside and outside of the
+      # container without having to worry about conflict (e.g. macOS vs Linux node dependencies). We use a named
+      # volume rather than an anonymous volume so we can easily identify the volume, and so that multiple anonymous
+      # volumes don't clog up our hard drives.
+#      - node_modules:/srv/app/node_modules:delegated
+#    networks:
+#      - no-internet
+
+volumes:
+  node_modules:
+
+networks:
+  no-internet:
+    driver: bridge
+    internal: true
